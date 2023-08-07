@@ -11,7 +11,7 @@ class UserRepository:
     def create_table_user(self):
         query = '''
             CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
+                _id SERIAL PRIMARY KEY,
                 name VARCHAR NOT NULL,
                 surname VARCHAR NOT NULL,
                 login VARCHAR NOT NULL,
@@ -28,7 +28,7 @@ class UserRepository:
         query = '''
             INSERT INTO users (name, surname, login, email, password, avatar)
             VALUES (%s, %s, %s, %s, %s, %s)
-            RETURNING id;
+            RETURNING _id;
         '''
         with self.connection.cursor() as cursor:
             cursor.execute(query, (user.name, user.surname, user.login, user.email, user.password, user.avatar))
@@ -38,7 +38,7 @@ class UserRepository:
 
     def read_user(self, user_id):
         query = '''
-            SELECT * FROM users WHERE id = %s;
+            SELECT * FROM users WHERE _id = %s;
         '''
         with self.connection.cursor() as cursor:
             cursor.execute(query, (user_id,))
@@ -52,19 +52,19 @@ class UserRepository:
         user = self.read_user(user_id)
         if not user:
             return False
-
+        # print(new_data)
         update_query = '''
             UPDATE users SET name = %s, surname = %s, login = %s, email = %s, password = %s, avatar = %s
-            WHERE id = %s;
+            WHERE _id = %s;
         '''
         with self.connection.cursor() as cursor:
             cursor.execute(update_query, (
-                new_data.get('name', user.name),
-                new_data.get('surname', user.surname),
-                new_data.get('login', user.login),
-                new_data.get('email', user.email),
-                new_data.get('password', user.password),
-                new_data.get('avatar', user.avatar),
+                new_data.name,
+                new_data.surname,
+                new_data.login,
+                new_data.email,
+                new_data.password,
+                new_data.avatar,
                 user_id
             ))
         self.connection.commit()
@@ -72,9 +72,21 @@ class UserRepository:
 
     def delete_user(self, user_id):
         query = '''
-            DELETE FROM users WHERE id = %s;
+            DELETE FROM users WHERE _id = %s;
         '''
         with self.connection.cursor() as cursor:
             cursor.execute(query, (user_id,))
         self.connection.commit()
         return True
+
+    def get_user_by_email(self, email):
+        query = '''
+                    SELECT * FROM users WHERE email = %s;
+                '''
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (email,))
+            row = cursor.fetchone()
+            if row:
+                _id, name, surname, login, email, password, avatar = row
+                return User(_id, name, surname, login, email, password, avatar)
+            return None

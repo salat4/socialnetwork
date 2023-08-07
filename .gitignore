@@ -1,1 +1,19 @@
 database.ini
+# Python и Django
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+# SQLite Database
+*.db.sqlite3
+# Static files
+/static/
+# Media files
+/media/
+# Virtual environment
+venv/
