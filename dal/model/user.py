@@ -11,3 +11,6 @@ class User:
     def __str__(self):
         return f"User(id={self._id}, name='{self.name}', surname='{self.surname}', login='{self.login}', email='{self.email}', password='{self.password}', avatar='{self.avatar}')"
 
+    def save(self):
+        pass
+
