@@ -14,7 +14,6 @@ class UserRepository:
                 _id SERIAL PRIMARY KEY,
                 name VARCHAR NOT NULL,
                 surname VARCHAR NOT NULL,
-                login VARCHAR NOT NULL,
                 email VARCHAR NOT NULL,
                 password VARCHAR NOT NULL,
                 avatar VARCHAR
@@ -26,14 +25,13 @@ class UserRepository:
 
     def create_user(self, user):
         query = '''
-            INSERT INTO users (name, surname, login, email, password, avatar)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            INSERT INTO users (name, surname, email, password, avatar)
+            VALUES (%s, %s, %s, %s, %s)
             RETURNING _id;
         '''
         with self.connection.cursor() as cursor:
-            cursor.execute(query, (user.name, user.surname, user.login, user.email, user.password, user.avatar))
+            cursor.execute(query, (user['name'], user['surname'], user['email'], user['password'], user['avatar']))
             user_id = cursor.fetchone()[0]
-            user.id = user_id
         self.connection.commit()
 
     def read_user(self, user_id):
@@ -44,8 +42,8 @@ class UserRepository:
             cursor.execute(query, (user_id,))
             row = cursor.fetchone()
             if row:
-                _id, name, surname, login, email, password, avatar = row
-                return User(_id, name, surname, login, email, password, avatar)
+                _id, name, surname, email, password, avatar = row
+                return User(_id, name, surname, email, password, avatar)
             return None
 
     def update_user(self, user_id, new_data):
@@ -54,14 +52,13 @@ class UserRepository:
             return False
         # print(new_data)
         update_query = '''
-            UPDATE users SET name = %s, surname = %s, login = %s, email = %s, password = %s, avatar = %s
+            UPDATE users SET name = %s, surname = %s, email = %s, password = %s, avatar = %s
             WHERE _id = %s;
         '''
         with self.connection.cursor() as cursor:
             cursor.execute(update_query, (
                 new_data.name,
                 new_data.surname,
-                new_data.login,
                 new_data.email,
                 new_data.password,
                 new_data.avatar,
@@ -87,6 +84,6 @@ class UserRepository:
             cursor.execute(query, (email,))
             row = cursor.fetchone()
             if row:
-                _id, name, surname, login, email, password, avatar = row
-                return User(_id, name, surname, login, email, password, avatar)
+                _id, name, surname, email, password, avatar = row
+                return User(_id, name, surname, email, password, avatar)
             return None
