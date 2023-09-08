@@ -54,8 +54,8 @@ class RegistrationView(APIView):
                 'password': password
             }
 
-            self.user_service.registration(user)
-
+            self.user_service.login(user)
+            # self.user_service.registration(user)
             return Response({'message': 'Registration successful'}, status=status.HTTP_200_OK)
 
         else:
